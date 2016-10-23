@@ -14,8 +14,8 @@ images = {
     'dummy': ['dummy.png']
 }
 
+
 def base_move_correction(rect, screen=SCREEN_SIZE):
-    print 'edit'
     if rect.left < 0:
         rect.left = 0
     elif rect.right > screen[0]:
@@ -25,6 +25,7 @@ def base_move_correction(rect, screen=SCREEN_SIZE):
     elif rect.bottom > screen[1]:
         rect.bottom = screen[1]
     return rect
+
 
 class Creature:
     def __init__(self, creature='dummy', coordinates=CREATURE_COORD,
@@ -51,7 +52,7 @@ class Creature:
             print 'Coordinates are', self.home_location
 
     def state_edit(self, direction='not_chosen'):
-        if direction in (['left', 'right', 'up', 'down']):
+        if direction in ('left', 'right', 'up', 'down'):
             self.state = direction
         else:
             print 'In class Creature state_edit():'
@@ -90,22 +91,37 @@ def main():
         pygame.init()
         test = Creature(coordinates=[300, 200])
         screen = pygame.display.set_mode(SCREEN_SIZE)
+        pressed_arrows = ['still']
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
                 elif event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_UP:
-                            test.state_edit('up')
-                        if event.key == pygame.K_DOWN:
-                            test.state_edit('down')
-                        if event.key == pygame.K_LEFT:
-                            test.state_edit('left')
-                        if event.key == pygame.K_RIGHT:
-                            test.state_edit('right')
+                    if event.key == pygame.K_UP:
+                        test.state_edit('up')
+                        pressed_arrows.append('up')
+                    if event.key == pygame.K_DOWN:
+                        test.state_edit('down')
+                        pressed_arrows.append('down')
+                    if event.key == pygame.K_LEFT:
+                        test.state_edit('left')
+                        pressed_arrows.append('left')
+                    if event.key == pygame.K_RIGHT:
+                        test.state_edit('right')
+                        pressed_arrows.append('right')
                 elif event.type == pygame.KEYUP:
-                        if event.key in (pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT):
-                            test.state = 'still'
+                    if event.key == pygame.K_UP:
+                        pressed_arrows.remove('up')
+                        test.state_edit(pressed_arrows[len(pressed_arrows) - 1])
+                    if event.key == pygame.K_DOWN:
+                        pressed_arrows.remove('down')
+                        test.state_edit(pressed_arrows[len(pressed_arrows) - 1])
+                    if event.key == pygame.K_LEFT:
+                        pressed_arrows.remove('left')
+                        test.state_edit(pressed_arrows[len(pressed_arrows) - 1])
+                    if event.key == pygame.K_RIGHT:
+                        pressed_arrows.remove('right')
+                        test.state_edit(pressed_arrows[len(pressed_arrows) - 1])
             test.moving()
             screen.fill([0, 0, 0])
             screen.blit(test.forward_image, test.forward_rect)
