@@ -6,7 +6,7 @@ SCREEN_SIZE = WIDTH, HEIGHT = 800, 600
 
 # hp, speed, danger level, damage, armor
 bestiary = {
-    'dummy': [5, 0, 0, 0, 0]
+    'dummy': [5, 5, 0, 0, 0]
 }
 
 # forward, (left, backward, right)
@@ -111,7 +111,7 @@ def main():
             screen.blit(test.forward_image, test.forward_rect)
             pygame.display.flip()
             pygame.display.update()
-            pygame.time.wait(10)
+            pygame.time.wait(40)
 
 try:
     main()
