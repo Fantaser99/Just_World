@@ -1,17 +1,20 @@
 import pygame
 
 CREATURE_COORD = CREATURE_COORD_X, CREATURE_COORD_Y = 200, 100
+HERO_BASE_COORD = HERO_COORD_X, HERO_COORD_Y = 300, 100
 CREATURE_HOME = FIRST_HOME_COORD, SECOND_HOME_COORD = [0, 0], [300, 200]
 SCREEN_SIZE = WIDTH, HEIGHT = 800, 600
 
 # hp, speed, danger level, damage, armor
 bestiary = {
-    'dummy': [5, 5, 0, 0, 0]
+    'dummy': [5, 2, 0, 0, 0],
+    'base_hero': [13, 5, 2, 4, 1]
 }
 
 # forward, (left, backward, right)
 images = {
-    'dummy': ['dummy.png']
+    'dummy': ['dummy.png'],
+    'base_hero': ['base_hero.png']
 }
 
 
@@ -29,7 +32,9 @@ def base_move_correction(rect, screen=SCREEN_SIZE):
 
 class Creature:
     def __init__(self, creature='dummy', coordinates=CREATURE_COORD,
-                 home_location=CREATURE_HOME, direction='forward'):
+                 # move it somewhere else:
+                 # home_location=CREATURE_HOME,
+                 direction='forward'):
         self.max_health_points = bestiary[creature][0]
         self.health_points = self.max_health_points
         self.move_speed = bestiary[creature][1]
@@ -45,11 +50,27 @@ class Creature:
             self.coordinates = [CREATURE_COORD_X, CREATURE_COORD_Y]
             print 'Coordinates are', self.coordinates
         self.direction = direction
-        if home_location[0][0] < 0 or home_location[0][1] < 0 or home_location[1][0] < 0 or home_location[1][1] < 0:
-            print 'In class Creature __init__():'
-            print 'Negative coordinates of home location do not have to be used.', home_location
-            self.home_location = CREATURE_HOME
-            print 'Coordinates are', self.home_location
+        # move it somewhere else:
+        # if home_location[0][0] < 0 or home_location[0][1] < 0 or home_location[1][0] < 0 or home_location[1][1] < 0:
+        #     print 'In class Creature __init__():'
+        #     print 'Negative coordinates of home location do not have to be used.', home_location
+        #     self.home_location = CREATURE_HOME
+        #     print 'Coordinates are', self.home_location
+
+    def deal_damage(self):
+        raise NotImplementedError('class Creature def deal_damage')
+
+    def take_damage(self):
+        raise NotImplementedError('class Creature def take_damage')
+
+    def __del__(self):
+        # here's just nothing to do now
+        pass
+
+
+class MainHero(Creature):
+    def __init__(self, creature='base_hero', coordinates=HERO_BASE_COORD, direction='forward'):
+        Creature.__init__(self, creature=creature, coordinates=coordinates, direction=direction)
 
     def state_edit(self, direction='not_chosen'):
         if direction in ('left', 'right', 'up', 'down'):
@@ -76,20 +97,13 @@ class Creature:
             self.forward_rect = self.forward_rect.move(move_shift)
             self.forward_rect = base_move_correction(self.forward_rect)
 
-    def deal_damage(self):
-        raise NotImplementedError('class Creature def deal_damage')
-
-    def take_damage(self):
-        raise NotImplementedError('class Creature def take_damage')
-
     def __del__(self):
         # here's just nothing to do now
         pass
 
-
 def main():
         pygame.init()
-        test = Creature(coordinates=[300, 200])
+        test = MainHero(creature='base_hero', coordinates=[300, 200])
         screen = pygame.display.set_mode(SCREEN_SIZE)
         pressed_arrows = ['still']
         while True:
