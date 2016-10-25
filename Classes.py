@@ -1,10 +1,14 @@
 import pygame
 
+ONE_TICK = 60
 CREATURE_COORD = CREATURE_COORD_X, CREATURE_COORD_Y = 200, 100
 HERO_BASE_COORD = HERO_COORD_X, HERO_COORD_Y = 300, 100
 CREATURE_HOME = FIRST_HOME_COORD, SECOND_HOME_COORD = [0, 0], [300, 200]
 SCREEN_SIZE = WIDTH, HEIGHT = 800, 600
+SCREEN_CELL = COUNT_X, COUNT_Y = 16, 12
 BASE_SCREEN_BG = [255, 255, 255]
+BLACK = [0, 0, 0]
+GRAY = [180, 180, 180]
 
 # hp, speed, danger level, damage, armor
 bestiary = {
@@ -66,17 +70,36 @@ class Game(object):
                 press_arrows(event, hero, self.pressed_arrows)
             elif event.type == pygame.KEYUP:
                 release_arrows(event, hero, self.pressed_arrows)
-        hero.moving()
+        self.draw_map(True)
+        self.move_hero(hero)
+        self.screen_update()
+
+    def draw_map(self, with_grid=False):
         self.screen.fill(BASE_SCREEN_BG)
+        if with_grid:
+            self.draw_grid()
+
+    def move_hero(self, hero):
+        hero.moving()
         self.screen.blit(hero.current_image, hero.rect)
+
+    @staticmethod
+    def screen_update():
         pygame.display.flip()
         pygame.display.update()
-        pygame.time.wait(80)
+        pygame.time.wait(ONE_TICK)
+
+    def draw_grid(self):
+            x_step, y_step = WIDTH // COUNT_X, HEIGHT // COUNT_Y
+            for i in range(x_step, WIDTH, x_step):
+                pygame.draw.line(self.screen, GRAY, [i, 0], [i, HEIGHT])
+            for i in range(y_step, HEIGHT, y_step):
+                pygame.draw.line(self.screen, GRAY, [0, i], [WIDTH, i])
 
 
 class Creature:
     def __init__(self, creature='dummy', coordinates=CREATURE_COORD,
-                 # move it somewhere else:
+                 # move it to Beast:
                  # home_location=CREATURE_HOME,
                  direction='forward'):
         self.max_health_points = bestiary[creature][0]
@@ -100,7 +123,7 @@ class Creature:
         else:
             self.coordinates = coordinates
         self.direction = direction
-        # move it somewhere else:
+        # move it to Beast:
         # if home_location[0][0] < 0 or home_location[0][1] < 0 or home_location[1][0] < 0 or home_location[1][1] < 0:
         #     print 'In class Creature __init__():'
         #     print 'Negative coordinates of home location do not have to be used.', home_location
@@ -132,6 +155,7 @@ class MainHero(Creature):
             print 'Creature will not move.'
             self.state = 'still'
 
+    # need optimization
     def moving(self):
         move_shift = [0, 0]
         if self.state == 'right':
@@ -161,4 +185,4 @@ def main():
 try:
     main()
 except NotImplementedError as error:
-    print 'Oops! You used not finished function in', error.args
+    print 'Oops! You caught some bug:', error.args
