@@ -1,5 +1,7 @@
 import pygame
 
+BASE_HERO_COORDINATES = [300, 200]
+BASE_X, BASE_Y = 0, 1
 ONE_TICK = 60
 CREATURE_COORD = CREATURE_COORD_X, CREATURE_COORD_Y = 200, 100
 HERO_BASE_COORD = HERO_COORD_X, HERO_COORD_Y = 300, 100
@@ -10,18 +12,17 @@ BASE_SCREEN_BG = [255, 255, 255]
 BLACK = [0, 0, 0]
 GRAY = [180, 180, 180]
 
-# hp, speed, danger level, damage, armor
+BEAST_HP, BEAST_SPEED, BEAST_DANGER, BEAST_DAMAGE, BEAST_ARMOR = 0, 1, 2, 3, 4
 bestiary = {
     'dummy': [5, 2, 0, 0, 0],
     'lil_hero': [7, 6, 1, 2, 2]
 }
 
-#
 items = {
     0: {"name": "Nothing", "icon": None, "weight": 0, "cost": 0, "description": "Empty", "item_id": 0},
 }
 
-# left, right, (forward, backward)
+IMG_LEFT, IMG_RIGHT, IMG_UP, ING_DOWN = 0, 1, 2, 3
 images = {
     'dummy': ['dummy_left.png', 'dummy_right.png'],
     'lil_hero': ['lil_hero_left.png', 'lil_hero_right.png']
@@ -52,12 +53,12 @@ def release_arrows(event, hero, pressed_arrows):
 def base_move_correction(rect, screen=SCREEN_SIZE):
     if rect.left < 0:
         rect.left = 0
-    elif rect.right > screen[0]:
-        rect.right = screen[0]
+    elif rect.right > screen[BASE_X]:
+        rect.right = screen[BASE_X]
     if rect.top < 0:
         rect.top = 0
-    elif rect.bottom > screen[1]:
-        rect.bottom = screen[1]
+    elif rect.bottom > screen[BASE_Y]:
+        rect.bottom = screen[BASE_Y]
     return rect
 
 
@@ -107,20 +108,20 @@ class Creature:
                  # move it to Beast:
                  # home_location=CREATURE_HOME,
                  direction='forward'):
-        self.max_health_points = bestiary[creature][0]
+        self.max_health_points = bestiary[creature][BEAST_HP]
         self.health_points = self.max_health_points
-        self.move_speed = bestiary[creature][1]
-        self.danger_level = bestiary[creature][2]
-        self.attack_strength = bestiary[creature][3]
-        self.damage_resist = bestiary[creature][4]
+        self.move_speed = bestiary[creature][BEAST_SPEED]
+        self.danger_level = bestiary[creature][BEAST_DANGER]
+        self.attack_strength = bestiary[creature][BEAST_DAMAGE]
+        self.damage_resist = bestiary[creature][BEAST_ARMOR]
         self.image = {
-            'left': pygame.image.load(images[creature][0]),
-            'right': pygame.image.load(images[creature][1])
+            'left': pygame.image.load(images[creature][IMG_LEFT]),
+            'right': pygame.image.load(images[creature][IMG_RIGHT])
         }
         self.current_image = self.image['left']
         self.rect = self.image['left'].get_rect()
         self.state = 'still'
-        if coordinates[0] < 0 or coordinates[1] < 0:
+        if coordinates[BASE_X] < 0 or coordinates[BASE_Y] < 0:
             print 'In class Creature __init__():'
             print 'Negative coordinates of creature do not have to be used.', coordinates
             self.coordinates = [CREATURE_COORD_X, CREATURE_COORD_Y]
@@ -161,8 +162,8 @@ class Item:
         self.on_ground = True
         self._id_ = identifier
         self.item_id = self.__get_new_item_id__()
-        self.x = coords[0]
-        self.y = coords[1]
+        self.x = coords[BASE_X]
+        self.y = coords[BASE_Y]
         # del self.getNewItemId  # this function shouldn't be in this class's objects.
 
     def get_item_id(self):
@@ -222,7 +223,7 @@ class Item:
         # Here should be coords check and changing coords of item in Player's inventory too.
         if True:
             raise NotImplementedError('Class Item, method move_in_inventory')
-        self.coords = (self.coords[0] + x, self.coords[1] + y)
+        self.coords = (self.coords[BASE_X] + x, self.coords[BASE_Y] + y)
 
 
 def init_screen(width=WIDTH, height=HEIGHT):
@@ -266,7 +267,7 @@ class MainHero(Creature):
 
 def main():
     just_world = Game()
-    hero = MainHero(creature='lil_hero', coordinates=[300, 200])
+    hero = MainHero(creature='lil_hero', coordinates=BASE_HERO_COORDINATES)
     while True:
         just_world.infinity_loop(hero)
 
